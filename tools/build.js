@@ -1,0 +1,28 @@
+//More info on webpack's node api here : https://webpack.github.io/docs/node.js-api.html
+//Allowing console calls below since this is a build file
+/*eslint-disable no-console */
+import webpack from 'webpack';
+import webpackConfig from '../webpack.config.prod';
+import colors from 'colors';
+
+process.env.NODE_ENV = 'production'; //this assures the babel dev config (for hot reloading) doesnt apply.
+
+console.log('Generating minified bundle for production via webpack. this will take a moment...'.blue);
+
+webpack(webpackConfig).run((err, stats)=>{
+    if(err) {//so a fatal error ocurred. Stop here
+        console.log(err.bold.red);
+        return 1;
+    }
+    const jsonStats = stats.toJson();
+    if(jsonStats.hasErrors){
+        return jsonStats.errors.map(error => console.log(error.red));
+    }
+    if(jsonStats.hasWarnings){
+        console.log('webpack generated the following warnings'.bold.yellow);
+    }
+    console.log('Webpack stats '+ stats);
+    //if we got this far the build succeded
+    console.log("Your app has been in prod mode".green);
+    return 0;
+});
